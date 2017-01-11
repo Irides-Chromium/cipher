@@ -1,0 +1,4 @@
+#!/bin/bash
+echo -n "Input your text: "
+read text
+echo $text | tr 'a-zA-Z' 'n-za-mN-ZA-M'
