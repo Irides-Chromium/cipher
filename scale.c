@@ -15,7 +15,7 @@
 #   define PRINTLONG(var) printf("\e[34mLONG\e[0m %s::%ld\n", #var, var);
 #   define PRINTPTR(var) printf("\e[35mPTR\e[0m %s::%p\n", #var, var);
 #   define PRINTSTR(var) printf("\e[36mSTR\e[0m %s::%s\n", #var, var);
-#   define CHECKPOINT() printf("\e[1;31mPASSED\e[0m line no. %d\n", __LINE__);
+#   define CHECKPOINTOINT() printf("\e[1;31mPASSED\e[0m line no. %d\n", __LINE__);
 #   define HORI() puts("-------------------------------------");
 #else
 #   define PRINTINT(var) 
@@ -40,7 +40,7 @@ char *scale(int cur, int res, char *num, bool *freeable) {
         posi = false;
         num++;
     }
-    int iresult = 0, unit = 1;
+    long iresult = 0, unit = 1;
     // iresult: Intermediate result
     char *sresult = NULL, value;
 
@@ -55,21 +55,21 @@ char *scale(int cur, int res, char *num, bool *freeable) {
         iresult += value * unit;
         unit *= cur;
     }
-    int len = log10(iresult) + 1;
-    sresult = calloc(len + 1, sizeof(char));
-    *freeable = true;
-    snprintf(sresult, len + 1, "%d", iresult);
+    //int len = log10(iresult) + 1;
+    //sresult = calloc(len + 1, sizeof(char));
+    //*freeable = true;
+    //snprintf(sresult, len + 1, "%d", iresult);
 
     // Output
-    free(sresult);
-    len = (int) (log(iresult) / log(res)) + 1;
+    //free(sresult);
+    int len = (int) (log(iresult) / log(res)) + 1;
     sresult = calloc(len + 1, sizeof(char));
-    *freeable = true;
+    //*freeable = true;
     char *ptr = sresult;
     ptr = len + sresult - 1;
     do {
-        value = fmod(iresult, res);
-        iresult /= (float) res;
+        value = iresult % res;
+        iresult /= res;
         if (value < 10) value += 48;
         else if (value < 36) value += 55;
         else if (value < 62) value += 61;

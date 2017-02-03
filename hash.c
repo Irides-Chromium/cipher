@@ -1,21 +1,20 @@
 // Hash function by Paul Hsieh
-// //#include "pstdint.h" /* Replace with <stdint.h> if appropriate */
+// Using int32_t instead of uint32_t to be compatible with the Java version
+// #include "pstdint.h" /* Replace with <stdint.h> if appropriate */
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#undef get16bits
-#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
-  || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
-#define get16bits(d) (*((const uint16_t *) (d)))
-#endif
 
-#if !defined (get16bits)
-#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
-                       +(uint32_t)(((const uint8_t *)(d))[0]) )
-#endif
+//#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
+//                       +(uint32_t)(((const uint8_t *)(d))[0]) )
 
-uint32_t SuperFastHash (const char * data, int len) {
-    uint32_t hash = len, tmp;
+int16_t get16bits(const char *d) {
+    return ((char) d[0] << 8) + (char) d[1];
+}
+
+int32_t SuperFastHash (const char * data, int len) {
+    int32_t hash = len, tmp;
     int rem;
 
     if (len <= 0 || data == NULL) return 0;
@@ -28,7 +27,7 @@ uint32_t SuperFastHash (const char * data, int len) {
         hash  += get16bits(data);
         tmp    = (get16bits(data + 2) << 11) ^ hash;
         hash   = (hash << 16) ^ tmp;
-        data  += 2 * sizeof(uint16_t);
+        data  += 2 * 2;
         hash  += hash >> 11;
     }
 
@@ -36,7 +35,7 @@ uint32_t SuperFastHash (const char * data, int len) {
     switch (rem) {
         case 3: hash += get16bits(data);
                 hash ^= hash << 16;
-                hash ^= ((signed char) data[sizeof(uint16_t)]) << 18;
+                hash ^= ((signed char) data[2]) << 18;
                 hash += hash >> 11;
                 break;
         case 2: hash += get16bits(data);
@@ -60,6 +59,8 @@ uint32_t SuperFastHash (const char * data, int len) {
 }
 
 int main (int argc, char **argv) {
-    printf("%x\n", SuperFastHash(argv[1], strlen(argv[1])));
+    printf("%d\n", SuperFastHash(argv[1], strlen(argv[1])));
+    //int i = atoi(argv[1]);
+    //printf("%x\n", SuperFastHash(&i, 4));
     return 0;
 }
